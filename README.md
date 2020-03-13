@@ -20,7 +20,7 @@ Qt application demonstrating the usage of QThreads
 - **Worker-->Main**: pyqtSignal: Worker.signalResultReady.
 
 ## Dummy laod: Fibunacci calculation
-- **-calc_fib** function calculates a fibunacci number. It's a nice dummy load, because the computation time scales exponentially this the input *z*. It is about a second for *z=33*.
-- **calc_fibunacci** is just a wrapper aroung **-calc_fib** which measures the computation time.
+- **_calc_fib** function calculates a fibunacci number. It's a nice dummy load, because the computation time scales exponentially this the input *z*. It is about a second for *z=33*.
+- **calc_fibunacci** is just a wrapper aroung **_calc_fib** which measures the computation time.
 
 
