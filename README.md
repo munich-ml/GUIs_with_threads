@@ -1,4 +1,4 @@
-# Andy, QThread-demo-app just for you
+# QThread-demo-app
 Qt application demonstrating the usage of QThreads
 
 ## Static UI with Qt Designer
