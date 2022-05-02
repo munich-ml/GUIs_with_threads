@@ -1,5 +1,7 @@
-# QThread-demo-app
-Qt application demonstrating the usage of QThreads
+# Qt based solution
+- GUI framework with **Qt**
+- theads with **QThreads**
+- inter-thread communication with **pyqtSignal**
 
 ## Static UI with Qt Designer
 - **Gui.ui** is the user interface definition, designed with the Qt Designer. 
