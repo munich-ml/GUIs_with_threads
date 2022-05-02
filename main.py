@@ -12,8 +12,8 @@ class QThreadDemo(QMainWindow, Ui_demo):
     """
     Simple Qt Application demonstrating the usage of a QThread
     """
-    def __init__(self, parent=None):
-        super(QThreadDemo, self).__init__(parent)
+    def __init__(self):
+        super().__init__()
         self.setupUi(self)
 
         self.buttonCalcMain.clicked.connect(self.on_button_calc_main)
@@ -23,25 +23,36 @@ class QThreadDemo(QMainWindow, Ui_demo):
         self.worker.signalResultReady.connect(self.show_new_result)
         self.worker.start()        # start the worker thread
 
+
     def on_button_calc_main(self):
+        """
+        calculate fibunacci in main thread
+        """
         fib = calc_fibunacci(self.spinBoxInput.value())
         self.show_new_result(fib)
 
+
     def on_button_calc_worker(self):
+        """
+        calculate fibunacci in worker thread
+        """
         self.worker.computeJobs.append(self.spinBoxInput.value())
 
+
     def show_new_result(self, result):
-        self.lineEditResult.setText(str(result[0]))
-        self.lineEditTime.setText(str(result[1]))
+        fib, t = result
+        self.lineEditResult.setText(str(fib))
+        self.lineEditTime.setText(str(t))
 
 
 class Worker(QThread):
-    signalResultReady = pyqtSignal(list)
+    signalResultReady = pyqtSignal(list)  
 
     def __init__(self):
-        super(Worker, self).__init__()
-        self.exiting = False            # kill thread by setting exiting=True
+        super().__init__()
+        self.exiting = False              # kill thread by setting exiting=True
         self.computeJobs = []
+
 
     def run(self):
         while not self.exiting:
@@ -51,7 +62,7 @@ class Worker(QThread):
             time.sleep(1e-4)
 
 
-def calc_fibunacci(z):
+def calc_fibunacci(z: int) -> list:
     """
     Dummy load: Calculates the fibunacci number of z.
                 Also measures the computation time.
@@ -62,7 +73,7 @@ def calc_fibunacci(z):
     return [res, computeTime]
 
 
-def _calc_fib(z):
+def _calc_fib(z: int) -> float:
     """
     Recursive fibunacci calculator
     """
