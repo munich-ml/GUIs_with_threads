@@ -1,4 +1,4 @@
-import time
+import time, threading, typing
 import tkinter as tk
 from collections import OrderedDict
 
@@ -29,22 +29,45 @@ class App(tk.Tk):
 
         self.buttons = OrderedDict()
         self.buttons["main"] = tk.Button(self.frames["lower"], text="compute in main thread", command=self.on_button_main)
-        self.buttons["worker"] = tk.Button(self.frames["lower"], text="compute in worker thread", command=self.on_button_main)
+        self.buttons["worker"] = tk.Button(self.frames["lower"], text="compute in worker thread", command=self.on_button_worker)
         for column, button in enumerate(self.buttons.values()):
             button.grid(row=0, column=column, padx=PADX, pady=PADY)
             
+        self.worker = Worker(self.update_results)
+        self.worker.start()
+            
             
     def on_button_main(self):
-        fib, time = calc_fibunacci(int(self.widgets["input"].get()))
-        self.update_results(fib, time)
+        fib, t = calc_fibunacci(int(self.widgets["input"].get()))
+        self.update_results(fib, t)
         
         
-    def update_results(self, fibunacci, time):
+    def on_button_worker(self):
+        self.worker.compute_inputs.append(int(self.widgets["input"].get()))
+        
+        
+    def update_results(self, fibunacci, t):
         self.widgets["fibunacci"].delete(0, tk.END)
         self.widgets["fibunacci"].insert(0, str(fibunacci))
         self.widgets["time"].delete(0, tk.END)
-        self.widgets["time"].insert(0, str(time))
+        self.widgets["time"].insert(0, str(t))
 
+
+class Worker(threading.Thread):
+    def __init__(self, callback: typing.Callable):
+        super().__init__()
+        self.exiting = False              # kill thread by setting exiting=True
+        self.compute_inputs = []
+        self.callback = callback
+
+
+    def run(self):
+        while not self.exiting:
+            if len(self.compute_inputs):
+                fib, t = calc_fibunacci(self.compute_inputs.pop())
+                self.callback(fib, t)
+            time.sleep(1e-4)
+            
 
 def calc_fibunacci(z: int) -> list:
     """
@@ -60,8 +83,8 @@ def calc_fibunacci(z: int) -> list:
     
     t0 = time.time()
     res = _calc_fib(z)
-    computeTime = time.time()-t0
-    return [res, computeTime]
+    compute_time = time.time()-t0
+    return [res, compute_time]
 
 
 if __name__ == "__main__":
