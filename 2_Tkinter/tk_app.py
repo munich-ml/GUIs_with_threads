@@ -1,3 +1,4 @@
+import time
 import tkinter as tk
 from collections import OrderedDict
 
@@ -34,12 +35,8 @@ class App(tk.Tk):
             
             
     def on_button_main(self):
-        for name, widget in self.widgets.items():
-            value = widget.get()
-            print(name, value, type(value))
-        
-        value = self.widgets["input"].get()
-        self.update_results(value, float(value)/3)
+        fib, time = calc_fibunacci(int(self.widgets["input"].get()))
+        self.update_results(fib, time)
         
         
     def update_results(self, fibunacci, time):
@@ -47,7 +44,24 @@ class App(tk.Tk):
         self.widgets["fibunacci"].insert(0, str(fibunacci))
         self.widgets["time"].delete(0, tk.END)
         self.widgets["time"].insert(0, str(time))
-        
+
+
+def calc_fibunacci(z: int) -> list:
+    """
+    Dummy load: Calculates the fibunacci number of z.
+                Also measures the computation time.
+    """
+    def _calc_fib(z: int) -> float:
+        """ Recursive fibunacci calculator
+        """
+        if z in (0, 1):
+            return 1
+        return _calc_fib(z-2) + _calc_fib(z-1)
+    
+    t0 = time.time()
+    res = _calc_fib(z)
+    computeTime = time.time()-t0
+    return [res, computeTime]
 
 
 if __name__ == "__main__":
