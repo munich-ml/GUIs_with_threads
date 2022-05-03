@@ -67,20 +67,17 @@ def calc_fibunacci(z: int) -> list:
     Dummy load: Calculates the fibunacci number of z.
                 Also measures the computation time.
     """
+    def _calc_fib(z: int) -> float:
+        """ Recursive fibunacci calculator
+        """
+        if z in (0, 1):
+            return 1
+        return _calc_fib(z-2) + _calc_fib(z-1)
+    
     t0 = time.time()
     res = _calc_fib(z)
     computeTime = time.time()-t0
     return [res, computeTime]
-
-
-def _calc_fib(z: int) -> float:
-    """
-    Recursive fibunacci calculator
-    """
-    if z in (0, 1):
-        return 1
-
-    return _calc_fib(z-2) + _calc_fib(z-1)
 
 
 if __name__ == '__main__':
