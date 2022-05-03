@@ -34,7 +34,20 @@ class App(tk.Tk):
             
             
     def on_button_main(self):
-        print("button main thread clicked")
+        for name, widget in self.widgets.items():
+            value = widget.get()
+            print(name, value, type(value))
+        
+        value = self.widgets["input"].get()
+        self.update_results(value, float(value)/3)
+        
+        
+    def update_results(self, fibunacci, time):
+        self.widgets["fibunacci"].delete(0, tk.END)
+        self.widgets["fibunacci"].insert(0, str(fibunacci))
+        self.widgets["time"].delete(0, tk.END)
+        self.widgets["time"].insert(0, str(time))
+        
 
 
 if __name__ == "__main__":
