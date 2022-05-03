@@ -1,9 +1,10 @@
-import time, threading, typing
+import logging, time, threading, typing
 import tkinter as tk
 from collections import OrderedDict
 
 PADX, PADY = 5, 3      # Widget padding
 
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s | %(threadName)12s | %(message)s')
 
 class App(tk.Tk):
     def __init__(self):
@@ -47,6 +48,7 @@ class App(tk.Tk):
         
         
     def update_results(self, fibunacci, t):
+        logging.debug(f"updating {fibunacci=}, {t=}")
         self.widgets["fibunacci"].delete(0, tk.END)
         self.widgets["fibunacci"].insert(0, str(fibunacci))
         self.widgets["time"].delete(0, tk.END)
@@ -62,11 +64,21 @@ class Worker(threading.Thread):
 
 
     def run(self):
+        logging.info("Starting thread")
+        previous_beakon = 0
+        beakon_period = 5
         while not self.exiting:
+            if previous_beakon + beakon_period < time.time():
+                previous_beakon = time.time()
+                logging.debug("Thread is running")
+                
             if len(self.compute_inputs):
                 fib, t = calc_fibunacci(self.compute_inputs.pop())
                 self.callback(fib, t)
+                
             time.sleep(1e-4)
+            
+        logging.info("Exiting thread")
             
 
 def calc_fibunacci(z: int) -> list:
@@ -81,6 +93,7 @@ def calc_fibunacci(z: int) -> list:
             return 1
         return _calc_fib(z-2) + _calc_fib(z-1)
     
+    logging.debug(f"calculating for {z=}")
     t0 = time.time()
     res = _calc_fib(z)
     compute_time = time.time()-t0
