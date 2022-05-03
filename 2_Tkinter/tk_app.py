@@ -26,16 +26,15 @@ class App(tk.Tk):
         self.widgets["fibunacci"] = tk.Entry(self.frames["upper"])
         self.widgets["time"] = tk.Entry(self.frames["upper"])
         for row, widget in enumerate(self.widgets.values()):
-            widget.grid(row=row, column=1, padx=PADX, pady=PADY, sticky="w")
-
+            widget.grid(row=row, column=1, padx=PADX, pady=PADY, sticky="w")       
+        
         self.buttons = OrderedDict()
         self.buttons["main"] = tk.Button(self.frames["lower"], text="compute in main thread", command=self.on_button_main)
         self.buttons["worker"] = tk.Button(self.frames["lower"], text="compute in worker thread", command=self.on_button_worker)
         for column, button in enumerate(self.buttons.values()):
             button.grid(row=0, column=column, padx=PADX, pady=PADY)
             
-        self.worker = Worker(self.update_results)
-        self.worker.start()
+        self.worker = Worker(callback=self.update_results)
             
             
     def on_button_main(self):
@@ -44,10 +43,12 @@ class App(tk.Tk):
         
         
     def on_button_worker(self):
-        self.worker.compute_inputs.append(int(self.widgets["input"].get()))
+        self.worker.input_queue.append(int(self.widgets["input"].get()))
         
         
     def update_results(self, fibunacci, t):
+        """ Updates the Tkinter Entry widgets fibunacci and t (time)
+        """
         logging.debug(f"updating {fibunacci=}, {t=}")
         self.widgets["fibunacci"].delete(0, tk.END)
         self.widgets["fibunacci"].insert(0, str(fibunacci))
@@ -57,28 +58,32 @@ class App(tk.Tk):
 
 class Worker(threading.Thread):
     def __init__(self, callback: typing.Callable):
+        """ 
+        Create and start a worker thread that calculates fibunacci numbers from inputs
+        in its input_queue.
+        :param typing.Callable callback: Funciton is called after calculation finished
+        """
         super().__init__()
-        self.exiting = False              # kill thread by setting exiting=True
-        self.compute_inputs = []
+        self.daemon = True    # Makes the thread exiting when the parent dies
+        self.input_queue = []
         self.callback = callback
+        self.start()      # autostart the thread
 
 
     def run(self):
         logging.info("Starting thread")
         previous_beakon = 0
-        beakon_period = 5
-        while not self.exiting:
+        beakon_period = 5    # Send runnig beakon every 5s
+        while True:
             if previous_beakon + beakon_period < time.time():
                 previous_beakon = time.time()
                 logging.debug("Thread is running")
                 
-            if len(self.compute_inputs):
-                fib, t = calc_fibunacci(self.compute_inputs.pop())
-                self.callback(fib, t)
+            if len(self.input_queue):
+                fib, t = calc_fibunacci(self.input_queue.pop())
+                self.callback(fib, t)  # execute the callback function
                 
             time.sleep(1e-4)
-            
-        logging.info("Exiting thread")
             
 
 def calc_fibunacci(z: int) -> list:
